@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barbearia Valdemar WD - Cloud Pro</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    
+    <style>
+        :root {
+            --bg-body: #121212;
+            --bg-card: #1c1c1c;
+            --primary: #e67e22; 
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --input-bg: #2a2a2a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%; max-width: 400px; height: 92vh;
+            background: var(--bg-body); border: 8px solid #333;
+            border-radius: 40px; position: relative; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .screen { display: none; height: 100%; padding: 20px; overflow-y: auto; }
+        .screen.active { display: block; }
+
+        .logo-area { text-align: center; margin: 15px 0; }
+        .logo-circle { 
+            width: 65px; height: 65px; background: var(--primary); border-radius: 50%; 
+            margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; 
+        }
+
+        h2, h3 { color: var(--primary); text-align: center; margin-bottom: 15px; }
+        label { display: block; margin: 12px 0 5px; color: var(--primary); font-size: 14px; font-weight: bold; }
+        
+        input { 
+            width: 100%; padding: 14px; background: var(--input-bg); border: 1px solid #444; 
+            border-radius: 12px; color: white; font-size: 16px; margin-bottom: 5px; outline: none;
+        }
+
+        .btn { 
+            width: 100%; padding: 16px; border: none; border-radius: 12px; 
+            background: var(--primary); color: white; font-weight: bold; cursor: pointer; margin-top: 15px;
+        }
+
+        .grid-select { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        
+        .item-select { 
+            background: var(--bg-card); padding: 15px; border-radius: 15px; 
+            text-align: center; border: 2px solid transparent; cursor: pointer; 
+            transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        
+        .item-select span { font-size: 24px; }
+        .item-select p { font-size: 14px; font-weight: 600; margin: 0; }
+        .item-select small { color: var(--text-muted); font-size: 11px; }
+
+        .item-select.selected { 
+            border-color: var(--primary); background: rgba(230, 126, 34, 0.15); 
+        }
+
+        .appointment-card { 
+            background: var(--bg-card); padding: 15px; border-radius: 12px; 
+            margin-bottom: 12px; border-left: 5px solid var(--primary); 
+        }
+
+        .btn-delete { background: #c0392b; color: white; border: none; padding: 10px; border-radius: 8px; width: 100%; margin-top: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="screen-login" class="screen active">
+        <div class="logo-area">
+            <div class="logo-circle">🧔🏻</div>
+            <h3>Barbearia Valdemar WD</h3>
+        </div>
+        <label>Seu Nome</label>
+        <input type="text" id="login-user" placeholder="Como te chamas?">
+        <label>Senha de Acesso</label>
+        <input type="password" id="login-pass" placeholder="****">
+        <button class="btn" onclick="checkLogin()">ENTRAR</button>
+    </div>
+
+    <div id="screen-staff" class="screen">
+        <h3>Escolha o Barbeiro</h3>
+        <div class="grid-select">
+            <div class="item-select" onclick="selectStaff(this, 'Valdemar')">
+                <span>👨🏻‍💼</span> <p>Valdemar</p>
+            </div>
+            <div class="item-select" onclick="selectStaff(this, 'Christiane')">
+                <span>👩🏼‍💼</span> <p>Christiane</p>
+            </div>
+            <div class="item-select" onclick="selectStaff(this, 'Gustavo')">
+                <span>👨🏻‍🦱</span> <p>Gustavo</p>
+            </div>
+            <div class="item-select" style="border: 1px dashed #444; opacity: 0.4;">
+                <span>➕</span> <p>Vago</p>
+            </div>
+        </div>
+        <button class="btn" onclick="navToBooking()">PRÓXIMO</button>
+    </div>
+
+    <div id="screen-home" class="screen">
+        <h3>Serviços e Data</h3>
+        <div class="grid-select">
+            <div class="item-select" onclick="selectService(this, 'Corte', 40)">
+                <span>✂️</span> <p>Corte</p> <small>40 min</small>
+            </div>
+            <div class="item-select" onclick="selectService(this, 'Barba', 25)">
+                <span>🪒</span> <p>Barba</p> <small>25 min</small>
+            </div>
+            <div class="item-select" onclick="selectService(this, 'Combo', 55)">
+                <span>🧔</span> <p>Combo</p> <small>55 min</small>
+            </div>
+            <div class="item-select" onclick="selectService(this, 'Pintura', 60)">
+                <span>🎨</span> <p>Pintura</p> <small>60 min</small>
+            </div>
+        </div>
+
+        <label>Data</label>
+        <input type="date" id="book-date">
+        <label>Horário</label>
+        <input type="time" id="book-time">
+
+        <button class="btn" onclick="confirmarAgendamento()">RESERVAR HORÁRIO</button>
+        <button class="btn" onclick="nav('screen-staff')" style="background:#333;">VOLTAR</button>
+    </div>
+
+    <div id="screen-admin" class="screen">
+        <h3>Painel Administrativo</h3>
+        <div id="admin-list">Carregando agendamentos...</div>
+        <button class="btn" onclick="nav('screen-login')" style="background:#333;">SAIR</button>
+    </div>
+</div>
+
+<script>
+    // --- INSIRA SEUS DADOS DO FIREBASE AQUI ---
+    const firebaseConfig = {
+        apiKey: "COLE_AQUI_SUA_KEY",
+        authDomain: "SEU_PROJETO.firebaseapp.com",
+        databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+        projectId: "SEU_PROJETO",
+        storageBucket: "SEU_PROJETO.appspot.com",
+        messagingSenderId: "SEU_ID",
+        appId: "SEU_APP_ID"
+    };
+
+    // Inicialização do Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    
+    const WHATSAPP_ADMIN = "5581998369415";
+    let selectedStaff = "", selectedService = "", selectedDuration = 0;
+
+    function nav(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'screen-admin') renderAdmin();
+    }
+
+    function checkLogin() {
+        const u = document.getElementById('login-user').value;
+        const p = document.getElementById('login-pass').value;
+        if(u === "ro" && p === "7771") nav('screen-admin');
+        else if(u.trim() !== "") nav('screen-staff');
+        else alert("Por favor, digite o seu nome.");
+    }
+
+    function selectStaff(el, n) {
+        document.querySelectorAll('#screen-staff .item-select').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected'); 
+        selectedStaff = n;
+    }
+
+    function navToBooking() {
+        if(!selectedStaff) return alert("Selecione um barbeiro!");
+        nav('screen-home');
+    }
+
+    function selectService(el, s, d) {
+        document.querySelectorAll('#screen-home .item-select').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected'); 
+        selectedService = s; 
+        selectedDuration = d;
+    }
+
+    function timeToMin(t) {
+        const [h, m] = t.split(':').map(Number);
+        return h * 60 + m;
+    }
+
+    function confirmarAgendamento() {
+        const data = document.getElementById('book-date').value;
+        const hora = document.getElementById('book-time').value;
+        const cliente = document.getElementById('login-user').value;
+
+        if(!selectedService || !data || !hora) return alert("Preencha todos os campos!");
+
+        const inicio = timeToMin(hora);
+        const fim = inicio + selectedDuration;
+
+        // VERIFICAÇÃO DE CONFLITO
+        database.ref('agendamentos').once('value').then((snapshot) => {
+            const ags = snapshot.val();
+            let temConflito = false;
+
+            if(ags) {
+                Object.values(ags).forEach(ag => {
+                    if(ag.data === data && ag.profissional === selectedStaff) {
+                        const exInicio = timeToMin(ag.hora);
+                        const exFim = exInicio + ag.duracao;
+                        if(inicio < exFim && fim > exInicio) temConflito = true;
+                    }
+                });
+            }
+
+            if(temConflito) {
+                alert("Este horário já está ocupado com " + selectedStaff);
+            } else {
+                database.ref('agendamentos').push({
+                    cliente, profissional: selectedStaff, servico: selectedService,
+                    duracao: selectedDuration, data, hora
+                }).then(() => {
+                    const msg = `Novo Agendamento!%0A👤 Cliente: ${cliente}%0A✂️ Serviço: ${selectedService}%0A👨‍🦱 Barbeiro: ${selectedStaff}%0A📅 Data: ${data}%0A⏰ Hora: ${hora}`;
+                    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_ADMIN}&text=${msg}`, '_blank');
+                    
+                    alert("Reserva concluída!");
+                    limparCampos();
+                    nav('screen-staff');
+                });
+            }
+        });
+    }
+
+    function limparCampos() {
+        document.getElementById('book-date').value = "";
+        document.getElementById('book-time').value = "";
+        selectedService = "";
+        selectedStaff = "";
+        document.querySelectorAll('.item-select').forEach(i => i.classList.remove('selected'));
+    }
+
+    function renderAdmin() {
+        const container = document.getElementById('admin-list');
+        database.ref('agendamentos').on('value', (snapshot) => {
+            container.innerHTML = "";
+            const data = snapshot.val();
+            if(!data) { container.innerHTML = "Nenhum agendamento."; return; }
+
+            Object.keys(data).forEach(id => {
+                const ag = data[id];
+                container.innerHTML += `
+                    <div class="appointment-card">
+                        <strong>${ag.profissional}</strong><br>
+                        <strong>Cliente: ${ag.cliente}</strong><br>
+                        <span>${ag.servico} - ${ag.data} às ${ag.hora}</span><br>
+                        <button class="btn-delete" onclick="deleteAg('${id}')">FINALIZAR</button>
+                    </div>`;
+            });
+        });
+    }
+
+    function deleteAg(id) {
+        if(confirm("Remover?")) database.ref('agendamentos/' + id).remove();
+    }
+</script>
+</body>
+</html>
