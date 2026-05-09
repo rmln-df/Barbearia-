@@ -3,39 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barbearia Valdemar WD - Oficial</title>
+    <title>Barbearia Valdemar WD</title>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; }
+        :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #27ae60; --danger: #c0392b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
         .app-container { width: 100%; max-width: 400px; height: 92vh; background: var(--bg); border: 8px solid #333; border-radius: 40px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .screen { display: none; height: 100%; padding: 20px; overflow-y: auto; }
+        .screen { display: none; height: 100%; padding: 25px; overflow-y: auto; }
         .screen.active { display: block; }
-        h3 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 32px; font-weight: bold; }
-        label { display: block; margin: 15px 0 5px; color: var(--primary); font-weight: bold; font-size: 14px; }
-        input { width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; }
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .item { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.2s; min-height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .item span { font-size: 24px; display: block; margin-bottom: 5px; }
-        .item p { font-size: 14px; margin: 0; font-weight: 600; }
-        .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); transform: scale(1.02); }
+        
+        h3 { color: var(--primary); text-align: center; margin-bottom: 25px; font-size: 28px; font-weight: bold; }
+        label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
+        small { color: #888; font-size: 11px; margin-bottom: 10px; display: block; }
+        
+        input { width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; font-size: 16px; }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .item { background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
+        .item span { font-size: 30px; display: block; margin-bottom: 8px; }
+        .item p { font-size: 15px; font-weight: 600; margin: 0; }
+        .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); transform: translateY(-3px); }
+
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+        .time-slot { padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; border: 2px solid var(--primary); color: var(--primary); cursor: pointer; transition: 0.3s; }
+        .time-slot.selected { background: var(--success); border-color: var(--success); color: white; }
+        .time-slot.occupied { background: var(--danger); border-color: var(--danger); color: white; cursor: not-allowed; opacity: 0.6; }
+
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        .btn-back { background: #333; margin-top: 10px; }
+        
         .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
-        .btn-del { background:#c0392b; padding:8px; border-radius:8px; border:none; color:white; font-size:12px; margin-top:8px; cursor:pointer; width: 100%; }
+        .tel-link { color: var(--primary); text-decoration: none; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div id="screen-login" class="screen active">
-        <h3 style="margin-top:40px;">Barbearia Valdemar</h3>
+        <h3 style="margin-top:50px;">Barbearia Valdemar</h3>
         <label>Seu Nome</label>
-        <input type="text" id="login-user" placeholder="Como te chamamos?">
-        <label>Senha</label>
-        <input type="password" id="login-pass" placeholder="****">
+        <input type="text" id="login-user" placeholder="Digite seu nome">
+        <label>Senha / Celular</label>
+        <small>Digite número do celular para acessar sua conta</small>
+        <input type="tel" id="login-pass" placeholder="Ex: 999998888">
         <button class="btn" onclick="checkLogin()">ENTRAR</button>
     </div>
 
@@ -43,33 +57,45 @@
         <h3>Profissional</h3>
         <div class="grid">
             <div class="item" onclick="selSt(this, 'Valdemar')"><span>👨🏻‍💼</span><p>Valdemar</p></div>
+            <!--
             <div class="item" onclick="selSt(this, 'Christiane')"><span>👩🏼‍💼</span><p>Christiane</p></div>
             <div class="item" onclick="selSt(this, 'Gustavo')"><span>👨🏻‍🦱</span><p>Gustavo</p></div>
+            -->
             <div class="item" onclick="selSt(this, 'Outros')"><span>💈</span><p>Outros</p></div>
         </div>
-        <button class="btn" onclick="proximoStaff()">PRÓXIMO</button>
+        <button class="btn btn-back" onclick="nav('screen-login')">VOLTAR</button>
     </div>
 
-    <div id="screen-home" class="screen">
+    <div id="screen-services" class="screen">
         <h3>Serviços</h3>
         <div class="grid">
-            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>✂️</span><p>Corte</p></div>
+            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>✂️</span><p>Corte/Tesoura</p></div>
+            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>🖲️</span><p>Corte/Degradê</p></div>
             <div class="item" onclick="selSr(this, 'Barba', 25)"><span>🪒</span><p>Barba</p></div>
             <div class="item" onclick="selSr(this, 'Combo', 50)"><span>🧔</span><p>Combo</p></div>
-            <div class="item" onclick="selSr(this, 'Tintura', 30)"><span>🎨</span><p>Tintura</p></div>
+            <div class="item" onclick="selSr(this, 'Luzes', 30)"><span>💡</span><p>Luzes</p></div>
+            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>🎨</span><p>Corte/pigmentação</p></div>
+            
         </div>
-        <label>Data</label>
-        <input type="date" id="book-date">
-        <label>Horário</label>
-        <input type="time" id="book-time">
+        <button class="btn btn-back" onclick="nav('screen-staff')">VOLTAR</button>
+    </div>
+
+    <div id="screen-booking" class="screen">
+        <h3>Agendamento</h3>
+        <label>Selecione a Data</label>
+        <input type="date" id="book-date" onchange="atualizarHorariosDisponiveis()">
+        
+        <label>Horários Disponíveis</label>
+        <div id="time-container" class="time-grid"></div>
+
         <button class="btn" id="btn-reservar" onclick="confirmarAgendamento()">RESERVAR AGORA</button>
-        <button class="btn" onclick="nav('screen-staff')" style="background:#333;">VOLTAR</button>
+        <button class="btn btn-back" onclick="nav('screen-services')">VOLTAR</button>
     </div>
 
     <div id="screen-admin" class="screen">
-        <h3>Painel de Controle</h3>
-        <div id="admin-list">Buscando agenda...</div>
-        <button class="btn" onclick="nav('screen-login')" style="background:#333;">SAIR</button>
+        <h3>Painel Admin</h3>
+        <div id="admin-list">Carregando...</div>
+        <button class="btn btn-back" onclick="nav('screen-login')">SAIR</button>
     </div>
 </div>
 
@@ -81,91 +107,102 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const WHATSAPP_ADMIN = "5582988358813";
+    const WHATSAPP_ADMIN = "5581998369415";
 
-    let sStaff = "", sService = "", sDur = 0;
+    let sStaff = "", sService = "", sDur = 0, sTime = "", sUser = "", sPhone = "";
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         document.getElementById(id).classList.add('active');
         if(id === 'screen-admin') renderAdmin();
+        if(id === 'screen-booking') gerarTabelaHorarios();
     }
 
     function checkLogin() {
         const u = document.getElementById('login-user').value.trim();
         const p = document.getElementById('login-pass').value.trim();
-        if(u === "ro" && p === "7771") nav('screen-admin');
-        else if(u !== "") nav('screen-staff');
-        else alert("Digite seu nome.");
+        
+        // Login do Administrador
+        if(u === "WD" && p === "9994") {
+            nav('screen-admin');
+            return;
+        }
+
+        // Login do Cliente (Validação de 8 ou 9 dígitos)
+        if(u !== "" && (p.length === 8 || p.length === 9)) {
+            sUser = u;
+            sPhone = p;
+            nav('screen-staff');
+        } else {
+            alert("Por favor, digite seu nome e o celular com 8 ou 9 dígitos.");
+        }
     }
 
     function selSt(el, n) {
         document.querySelectorAll('#screen-staff .item').forEach(i => i.classList.remove('selected'));
         el.classList.add('selected'); sStaff = n;
-    }
-
-    function proximoStaff() {
-        if(!sStaff) return alert("Selecione o Profissional!");
-        nav('screen-home');
+        setTimeout(() => nav('screen-services'), 300);
     }
 
     function selSr(el, s, d) {
-        document.querySelectorAll('#screen-home .item').forEach(i => i.classList.remove('selected'));
+        document.querySelectorAll('#screen-services .item').forEach(i => i.classList.remove('selected'));
         el.classList.add('selected'); sService = s; sDur = d;
+        setTimeout(() => nav('screen-booking'), 300);
     }
 
-    function timeToMin(t) {
-        const [h, m] = t.split(':').map(Number);
-        return h * 60 + m;
+    function gerarTabelaHorarios() {
+        const container = document.getElementById('time-container');
+        container.innerHTML = "";
+        const horarios = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00"];
+        horarios.forEach(hora => {
+            const div = document.createElement('div');
+            div.className = 'time-slot';
+            div.innerText = hora;
+            div.onclick = () => {
+                if(div.classList.contains('occupied')) return;
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                div.classList.add('selected');
+                sTime = hora;
+            };
+            container.appendChild(div);
+        });
+        atualizarHorariosDisponiveis();
+    }
+
+    function atualizarHorariosDisponiveis() {
+        const data = document.getElementById('book-date').value;
+        if(!data || !sStaff) return;
+        database.ref('agendamentos').once('value').then(snap => {
+            const ags = snap.val();
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('occupied', 'selected');
+                const h = slot.innerText;
+                if(ags) {
+                    Object.values(ags).forEach(ag => {
+                        if(ag.data === data && ag.profissional === sStaff && ag.hora === h) {
+                            slot.classList.add('occupied');
+                        }
+                    });
+                }
+            });
+        });
     }
 
     function confirmarAgendamento() {
         const data = document.getElementById('book-date').value;
-        const hora = document.getElementById('book-time').value;
-        const cliente = document.getElementById('login-user').value;
-
-        if(!sService || !data || !hora) return alert("Selecione o serviço e horário!");
-
-        const inicioNovo = timeToMin(hora);
-        const fimNovo = inicioNovo + sDur;
+        if(!data || !sTime) return alert("Escolha a Data e o Horário!");
         const btn = document.getElementById('btn-reservar');
-
-        btn.innerText = "VERIFICANDO...";
+        btn.innerText = "SALVANDO...";
         btn.disabled = true;
 
-        database.ref('agendamentos').once('value').then((snap) => {
-            const agendamentos = snap.val();
-            let conflito = false;
-
-            if (agendamentos) {
-                Object.values(agendamentos).forEach(ag => {
-                    if (ag.data === data && ag.profissional === sStaff) {
-                        const inicioExistente = timeToMin(ag.hora);
-                        const fimExistente = inicioExistente + ag.duracao;
-
-                        // Verifica se o novo horário se sobrepõe ao existente
-                        if (inicioNovo < fimExistente && fimNovo > inicioExistente) {
-                            conflito = true;
-                        }
-                    }
-                });
-            }
-
-            if (conflito) {
-                alert("❌ Este profissional já tem um cliente neste horário. Escolha outro momento!");
-                btn.innerText = "RESERVAR AGORA";
-                btn.disabled = false;
-            } else {
-                database.ref('agendamentos').push({
-                    cliente, profissional: sStaff, servico: sService,
-                    duracao: sDur, data, hora
-                }).then(() => {
-                    alert("✅ Agendado com sucesso!");
-                    const msg = `Novo Agendamento!%0A👤 Cliente: ${cliente}%0A✂️ Serviço: ${sService}%0A👨‍🦱 Barbeiro: ${sStaff}%0A📅 Data: ${data}%0A⏰ Hora: ${hora}`;
-                    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_ADMIN}&text=${msg}`, '_blank');
-                    location.reload(); 
-                });
-            }
+        database.ref('agendamentos').push({
+            cliente: sUser, telefone: sPhone, profissional: sStaff, servico: sService,
+            duracao: sDur, data, hora: sTime
+        }).then(() => {
+            alert("✅ Sucesso! Seu horário foi reservado.");
+            const msg = `Novo Agendamento!%0A👤 Cliente: ${sUser}%0A📞 Tel: ${sPhone}%0A✂️ Serviço: ${sService}%0A👨‍🦱 Profissional: ${sStaff}%0A📅 Data: ${data}%0A⏰ Hora: ${sTime}`;
+            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_ADMIN}&text=${msg}`, '_blank');
+            location.reload(); 
         });
     }
 
@@ -175,19 +212,19 @@
             container.innerHTML = "";
             const val = snap.val();
             if(!val) return container.innerHTML = "Agenda vazia.";
-            
             Object.keys(val).forEach(id => {
                 const ag = val[id];
                 container.innerHTML += `<div class="appointment-card">
                     <strong style="color:var(--primary)">${ag.profissional}</strong> | ${ag.cliente}<br>
-                    <span>${ag.servico} (${ag.duracao}min) - ${ag.data} às ${ag.hora}</span>
-                    <button class="btn-del" onclick="del('${id}')">FINALIZAR / EXCLUIR</button>
+                    <span>📞 <a href="tel:${ag.telefone}" class="tel-link">${ag.telefone}</a></span><br>
+                    <span>${ag.servico} - ${ag.data} às ${ag.hora}</span>
+                    <button class="btn" style="background:var(--danger); padding:5px; margin-top:8px;" onclick="del('${id}')">REMOVER</button>
                 </div>`;
             });
         });
     }
 
-    function del(id) { if(confirm("Excluir agendamento?")) database.ref('agendamentos/' + id).remove(); }
+    function del(id) { if(confirm("Excluir?")) database.ref('agendamentos/' + id).remove(); }
 </script>
 </body>
 </html>
