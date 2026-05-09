@@ -11,71 +11,20 @@
         :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #27ae60; --danger: #c0392b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
-        body { 
-            background-color: var(--bg); 
-            color: var(--text); 
-            font-family: 'Segoe UI', sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-            margin: 0;
-        }
+        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         
-        /* CONTAINER RESPONSIVO */
-        .app-container { 
-            width: 100%; 
-            max-width: 500px; /* Limite para Tablets/PC */
-            height: 100vh; 
-            background: var(--bg); 
-            position: relative; 
-            overflow: hidden; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.8);
-        }
+        .app-container { width: 100%; max-width: 500px; height: 100vh; background: var(--bg); position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
 
-        /* Ajuste para telas maiores (Simular App no PC) */
-        @media (min-width: 600px) {
-            .app-container {
-                height: 92vh;
-                border: 6px solid #333;
-                border-radius: 30px;
-            }
-        }
+        @media (min-width: 600px) { .app-container { height: 92vh; border: 6px solid #333; border-radius: 30px; } }
 
         .screen { display: none; height: 100%; padding: 20px; overflow-y: auto; }
         .screen.active { display: block; }
 
-        /* TOAST AVISO */
-        #toast-aviso {
-            position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
-            width: 90%; background: var(--primary); color: white; padding: 15px;
-            border-radius: 12px; text-align: center; font-weight: bold; z-index: 1000;
-            transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-        }
+        #toast-aviso { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; z-index: 1000; transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
         #toast-aviso.show { top: 20px; }
         
-        /* TÍTULOS RESPONSIVOS */
-        h3 { 
-            color: var(--primary); 
-            text-align: center; 
-            margin-bottom: 20px; 
-            font-size: 28px; 
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Estilo especial para o título da Barbearia na Home */
-        .titulo-principal {
-            font-size: 45px !important; /* Ajustado para não estourar em celulares pequenos */
-            line-height: 1;
-            margin-top: 40px;
-        }
-
-        @media (max-width: 380px) {
-            .titulo-principal { font-size: 35px !important; }
-            h3 { font-size: 24px; }
-        }
+        h3 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .titulo-principal { font-size: 45px !important; line-height: 1; margin-top: 40px; }
 
         label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
         small { color: #888; font-size: 11px; margin-bottom: 10px; display: block; }
@@ -170,6 +119,14 @@
 
     let sStaff = "", sService = "", sDur = 0, sTime = "", sUser = "", sPhone = "";
 
+    // Carrega os dados salvos se não for Admin
+    window.onload = function() {
+        const salvoNome = localStorage.getItem('barbearia_nome');
+        const salvoFone = localStorage.getItem('barbearia_fone');
+        if(salvoNome) document.getElementById('login-user').value = salvoNome;
+        if(salvoFone) document.getElementById('login-pass').value = salvoFone;
+    }
+
     function mostrarAviso(texto, cor = "#e67e22") {
         const toast = document.getElementById('toast-aviso');
         toast.innerText = texto;
@@ -188,11 +145,26 @@
     function checkLogin() {
         const u = document.getElementById('login-user').value.trim();
         const p = document.getElementById('login-pass').value.trim();
-        if(u === "WD" && p === "9994") { nav('screen-admin'); return; }
-        if(u !== "" && (p.length === 8 || p.length === 9 || p.length === 11)) {
-            sUser = u; sPhone = p; nav('screen-staff');
+        
+        // REGRA DE ADMIN: Limpa o LocalStorage e entra no painel
+        if(u === "WD" && p === "9994") { 
+            localStorage.removeItem('barbearia_nome');
+            localStorage.removeItem('barbearia_fone');
+            document.getElementById('login-user').value = "";
+            document.getElementById('login-pass').value = "";
+            nav('screen-admin'); 
+            return; 
+        }
+        
+        if(u !== "" && (p.length >= 8)) {
+            // REGRA DE CLIENTE: Grava os dados para a próxima vez
+            localStorage.setItem('barbearia_nome', u);
+            localStorage.setItem('barbearia_fone', p);
+            
+            sUser = u; sPhone = p; 
+            nav('screen-staff');
         } else {
-            mostrarAviso("Nome e Celular obrigatórios!", "var(--danger)");
+            mostrarAviso("Preencha Nome e Celular corretamente!", "var(--danger)");
         }
     }
 
@@ -212,19 +184,14 @@
         const container = document.getElementById('time-container');
         container.innerHTML = "";
         const horarios = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00"];
-        
         horarios.forEach(hora => {
             const div = document.createElement('div');
             div.className = 'time-slot';
             div.innerText = hora;
             div.onclick = () => {
-                if(div.classList.contains('occupied')) {
-                    mostrarAviso("⚠️ Horário já ocupado!", "var(--danger)");
-                    return;
-                }
+                if(div.classList.contains('occupied')) { mostrarAviso("⚠️ Horário já ocupado!", "var(--danger)"); return; }
                 document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                div.classList.add('selected'); 
-                sTime = hora;
+                div.classList.add('selected'); sTime = hora;
             };
             container.appendChild(div);
         });
