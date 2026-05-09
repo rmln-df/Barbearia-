@@ -15,6 +15,15 @@
         .app-container { width: 100%; max-width: 400px; height: 92vh; background: var(--bg); border: 8px solid #333; border-radius: 40px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .screen { display: none; height: 100%; padding: 25px; overflow-y: auto; }
         .screen.active { display: block; }
+
+        /* AVISO PERSONALIZADO */
+        #toast-aviso {
+            position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 85%; background: var(--primary); color: white; padding: 15px;
+            border-radius: 12px; text-align: center; font-weight: bold; z-index: 1000;
+            transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+        #toast-aviso.show { top: 30px; }
         
         h3 { color: var(--primary); text-align: center; margin-bottom: 25px; font-size: 28px; font-weight: bold; }
         label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
@@ -25,13 +34,13 @@
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .item { background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
         .item span { font-size: 30px; display: block; margin-bottom: 8px; }
-        .item p { font-size: 15px; font-weight: 600; margin: 0; }
+        .item p { font-size: 14px; font-weight: 600; margin: 0; }
         .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); transform: translateY(-3px); }
 
         .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
         .time-slot { padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; border: 2px solid var(--primary); color: var(--primary); cursor: pointer; transition: 0.3s; }
         .time-slot.selected { background: var(--success); border-color: var(--success); color: white; }
-        .time-slot.occupied { background: var(--danger); border-color: var(--danger); color: white; cursor: not-allowed; opacity: 0.6; }
+        .time-slot.occupied { background: var(--danger); border-color: var(--danger); color: white; cursor: pointer; opacity: 0.8; }
 
         .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
         .btn-back { background: #333; margin-top: 10px; }
@@ -43,6 +52,8 @@
 <body>
 
 <div class="app-container">
+    <div id="toast-aviso">Mensagem</div>
+
     <div id="screen-login" class="screen active">
         <h3 style="margin-top:50px;">Barbearia Valdemar</h3>
         <label>Seu Nome</label>
@@ -57,10 +68,6 @@
         <h3>Profissional</h3>
         <div class="grid">
             <div class="item" onclick="selSt(this, 'Valdemar')"><span>👨🏻‍💼</span><p>Valdemar</p></div>
-            <!--
-            <div class="item" onclick="selSt(this, 'Christiane')"><span>👩🏼‍💼</span><p>Christiane</p></div>
-            <div class="item" onclick="selSt(this, 'Gustavo')"><span>👨🏻‍🦱</span><p>Gustavo</p></div>
-            -->
             <div class="item" onclick="selSt(this, 'Outros')"><span>💈</span><p>Outros</p></div>
         </div>
         <button class="btn btn-back" onclick="nav('screen-login')">VOLTAR</button>
@@ -69,13 +76,12 @@
     <div id="screen-services" class="screen">
         <h3>Serviços</h3>
         <div class="grid">
-            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>✂️</span><p>Corte/Tesoura</p></div>
-            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>🖲️</span><p>Corte/Degradê</p></div>
+            <div class="item" onclick="selSr(this, 'Corte/Tesoura', 30)"><span>✂️</span><p>Corte/Tesoura</p></div>
+            <div class="item" onclick="selSr(this, 'Corte/Degradê', 30)"><span>🖲️</span><p>Corte/Degradê</p></div>
             <div class="item" onclick="selSr(this, 'Barba', 25)"><span>🪒</span><p>Barba</p></div>
             <div class="item" onclick="selSr(this, 'Combo', 50)"><span>🧔</span><p>Combo</p></div>
             <div class="item" onclick="selSr(this, 'Luzes', 30)"><span>💡</span><p>Luzes</p></div>
-            <div class="item" onclick="selSr(this, 'Corte', 30)"><span>🎨</span><p>Corte/pigmentação</p></div>
-            
+            <div class="item" onclick="selSr(this, 'Corte/pigmentação', 30)"><span>🎨</span><p>Corte/pigmentação</p></div>
         </div>
         <button class="btn btn-back" onclick="nav('screen-staff')">VOLTAR</button>
     </div>
@@ -107,9 +113,17 @@
 
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const WHATSAPP_ADMIN = "5581998369415";
+    const WHATSAPP_ADMIN = "5582999480685";
 
     let sStaff = "", sService = "", sDur = 0, sTime = "", sUser = "", sPhone = "";
+
+    function mostrarAviso(texto, cor = "#e67e22") {
+        const toast = document.getElementById('toast-aviso');
+        toast.innerText = texto;
+        toast.style.background = cor;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
 
     function nav(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -121,20 +135,11 @@
     function checkLogin() {
         const u = document.getElementById('login-user').value.trim();
         const p = document.getElementById('login-pass').value.trim();
-        
-        // Login do Administrador
-        if(u === "WD" && p === "9994") {
-            nav('screen-admin');
-            return;
-        }
-
-        // Login do Cliente (Validação de 8 ou 9 dígitos)
+        if(u === "WD" && p === "9994") { nav('screen-admin'); return; }
         if(u !== "" && (p.length === 8 || p.length === 9)) {
-            sUser = u;
-            sPhone = p;
-            nav('screen-staff');
+            sUser = u; sPhone = p; nav('screen-staff');
         } else {
-            alert("Por favor, digite seu nome e o celular com 8 ou 9 dígitos.");
+            mostrarAviso("Nome e Celular (8 ou 9 dígitos)!", "var(--danger)");
         }
     }
 
@@ -154,14 +159,19 @@
         const container = document.getElementById('time-container');
         container.innerHTML = "";
         const horarios = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00"];
+        
         horarios.forEach(hora => {
             const div = document.createElement('div');
             div.className = 'time-slot';
             div.innerText = hora;
             div.onclick = () => {
-                if(div.classList.contains('occupied')) return;
+                // SE O HORÁRIO ESTIVER OCUPADO (VERMELHO)
+                if(div.classList.contains('occupied')) {
+                    mostrarAviso("⚠️ Este horário já está ocupado por outro cliente!", "var(--danger)");
+                    return;
+                }
                 document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                div.classList.add('selected');
+                div.classList.add('selected'); 
                 sTime = hora;
             };
             container.appendChild(div);
@@ -190,19 +200,20 @@
 
     function confirmarAgendamento() {
         const data = document.getElementById('book-date').value;
-        if(!data || !sTime) return alert("Escolha a Data e o Horário!");
+        if(!data || !sTime) return mostrarAviso("Escolha Data e Horário!", "var(--danger)");
         const btn = document.getElementById('btn-reservar');
-        btn.innerText = "SALVANDO...";
-        btn.disabled = true;
+        btn.innerText = "SALVANDO..."; btn.disabled = true;
 
         database.ref('agendamentos').push({
             cliente: sUser, telefone: sPhone, profissional: sStaff, servico: sService,
             duracao: sDur, data, hora: sTime
         }).then(() => {
-            alert("✅ Sucesso! Seu horário foi reservado.");
+            mostrarAviso("✅ Sucesso! Horário reservado.", "var(--success)");
             const msg = `Novo Agendamento!%0A👤 Cliente: ${sUser}%0A📞 Tel: ${sPhone}%0A✂️ Serviço: ${sService}%0A👨‍🦱 Profissional: ${sStaff}%0A📅 Data: ${data}%0A⏰ Hora: ${sTime}`;
-            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_ADMIN}&text=${msg}`, '_blank');
-            location.reload(); 
+            setTimeout(() => {
+                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_ADMIN}&text=${msg}`, '_blank');
+                location.reload(); 
+            }, 1500);
         });
     }
 
@@ -224,7 +235,7 @@
         });
     }
 
-    function del(id) { if(confirm("Excluir?")) database.ref('agendamentos/' + id).remove(); }
+    function del(id) { if(confirm("Deseja realmente excluir este agendamento?")) database.ref('agendamentos/' + id).remove(); }
 </script>
 </body>
 </html>
