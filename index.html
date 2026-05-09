@@ -10,43 +10,94 @@
     <style>
         :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #27ae60; --danger: #c0392b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         
-        .app-container { width: 100%; max-width: 400px; height: 92vh; background: var(--bg); border: 8px solid #333; border-radius: 40px; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .screen { display: none; height: 100%; padding: 25px; overflow-y: auto; }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            margin: 0;
+        }
+        
+        /* CONTAINER RESPONSIVO */
+        .app-container { 
+            width: 100%; 
+            max-width: 500px; /* Limite para Tablets/PC */
+            height: 100vh; 
+            background: var(--bg); 
+            position: relative; 
+            overflow: hidden; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Ajuste para telas maiores (Simular App no PC) */
+        @media (min-width: 600px) {
+            .app-container {
+                height: 92vh;
+                border: 6px solid #333;
+                border-radius: 30px;
+            }
+        }
+
+        .screen { display: none; height: 100%; padding: 20px; overflow-y: auto; }
         .screen.active { display: block; }
 
-        /* AVISO PERSONALIZADO */
+        /* TOAST AVISO */
         #toast-aviso {
             position: absolute; top: -100px; left: 50%; transform: translateX(-50%);
-            width: 85%; background: var(--primary); color: white; padding: 15px;
+            width: 90%; background: var(--primary); color: white; padding: 15px;
             border-radius: 12px; text-align: center; font-weight: bold; z-index: 1000;
             transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.4);
         }
-        #toast-aviso.show { top: 30px; }
+        #toast-aviso.show { top: 20px; }
         
-        h3 { color: var(--primary); text-align: center; margin-bottom: 90px; font-size: 50px; font-weight: bold; }
+        /* TÍTULOS RESPONSIVOS */
+        h3 { 
+            color: var(--primary); 
+            text-align: center; 
+            margin-bottom: 20px; 
+            font-size: 28px; 
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Estilo especial para o título da Barbearia na Home */
+        .titulo-principal {
+            font-size: 45px !important; /* Ajustado para não estourar em celulares pequenos */
+            line-height: 1;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 380px) {
+            .titulo-principal { font-size: 35px !important; }
+            h3 { font-size: 24px; }
+        }
+
         label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
         small { color: #888; font-size: 11px; margin-bottom: 10px; display: block; }
         
         input { width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; font-size: 16px; }
         
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .item { background: var(--card); padding: 20px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
-        .item span { font-size: 30px; display: block; margin-bottom: 8px; }
-        .item p { font-size: 14px; font-weight: 600; margin: 0; }
-        .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); transform: translateY(-3px); }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .item { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
+        .item span { font-size: 24px; display: block; margin-bottom: 5px; }
+        .item p { font-size: 13px; font-weight: 600; margin: 0; color: #eee; }
+        .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); }
 
-        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-        .time-slot { padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; border: 2px solid var(--primary); color: var(--primary); cursor: pointer; transition: 0.3s; }
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+        .time-slot { padding: 10px 5px; border-radius: 8px; text-align: center; font-size: 14px; font-weight: bold; border: 2px solid var(--primary); color: var(--primary); cursor: pointer; }
         .time-slot.selected { background: var(--success); border-color: var(--success); color: white; }
-        .time-slot.occupied { background: var(--danger); border-color: var(--danger); color: white; cursor: pointer; opacity: 0.8; }
+        .time-slot.occupied { background: var(--danger); border-color: var(--danger); color: white; opacity: 0.8; }
 
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; }
+        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; text-transform: uppercase; }
         .btn-back { background: #333; margin-top: 10px; }
         
-        .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--primary); }
-        .tel-link { color: var(--primary); text-decoration: none; font-size: 14px; font-weight: bold; }
+        .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--primary); font-size: 14px; }
+        .tel-link { color: var(--primary); text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -55,19 +106,15 @@
     <div id="toast-aviso">Mensagem</div>
 
     <div id="screen-login" class="screen active">
-        <!--
-        <h3 style="margin-top:50px;">Barbearia Valdemar</h3>
-        -->
-        <h3 style="margin-top:30px; font-size: 70px; border-bottom: none;">Barbearia Waldemar</h3>
-<p style="text-align:center; color:gray; margin-top:-80px; font-weight:bold;">WD</p>
-
+        <h3 class="titulo-principal">Barbearia Waldemar</h3>
+        <p style="text-align:center; color:gray; font-weight:bold; margin-bottom:30px;">WORK DESIGN</p>
         
         <label>Seu Nome</label>
         <input type="text" id="login-user" placeholder="Digite seu nome">
-        <label>Senha / Celular</label>
-        <small>Digite número do celular para acessar sua conta</small>
-        <input type="tel" id="login-pass" placeholder="Ex: 999998888">
-        <button class="btn" onclick="checkLogin()">ENTRAR</button>
+        <label>Celular (Senha)</label>
+        <small>Use seu número para acessar a conta</small>
+        <input type="tel" id="login-pass" placeholder="Ex: 82999998888">
+        <button class="btn" onclick="checkLogin()">ACESSAR SISTEMA</button>
     </div>
 
     <div id="screen-staff" class="screen">
@@ -87,7 +134,7 @@
             <div class="item" onclick="selSr(this, 'Barba', 25)"><span>🪒</span><p>Barba</p></div>
             <div class="item" onclick="selSr(this, 'Combo', 50)"><span>🧔</span><p>Combo</p></div>
             <div class="item" onclick="selSr(this, 'Luzes', 30)"><span>💡</span><p>Luzes</p></div>
-            <div class="item" onclick="selSr(this, 'Corte/pigmentação', 30)"><span>🎨</span><p>Corte/pigmentação</p></div>
+            <div class="item" onclick="selSr(this, 'Corte/pigmentação', 30)"><span>🎨</span><p>Corte/Pigmentação</p></div>
         </div>
         <button class="btn btn-back" onclick="nav('screen-staff')">VOLTAR</button>
     </div>
@@ -96,10 +143,8 @@
         <h3>Agendamento</h3>
         <label>Selecione a Data</label>
         <input type="date" id="book-date" onchange="atualizarHorariosDisponiveis()">
-        
-        <label>Horários Disponíveis</label>
+        <label>Horários</label>
         <div id="time-container" class="time-grid"></div>
-
         <button class="btn" id="btn-reservar" onclick="confirmarAgendamento()">RESERVAR AGORA</button>
         <button class="btn btn-back" onclick="nav('screen-services')">VOLTAR</button>
     </div>
@@ -142,10 +187,10 @@
         const u = document.getElementById('login-user').value.trim();
         const p = document.getElementById('login-pass').value.trim();
         if(u === "WD" && p === "9994") { nav('screen-admin'); return; }
-        if(u !== "" && (p.length === 8 || p.length === 9)) {
+        if(u !== "" && (p.length === 8 || p.length === 9 || p.length === 11)) {
             sUser = u; sPhone = p; nav('screen-staff');
         } else {
-            mostrarAviso("Nome e Celular (8 ou 9 dígitos)!", "var(--danger)");
+            mostrarAviso("Nome e Celular obrigatórios!", "var(--danger)");
         }
     }
 
@@ -171,9 +216,8 @@
             div.className = 'time-slot';
             div.innerText = hora;
             div.onclick = () => {
-                // SE O HORÁRIO ESTIVER OCUPADO (VERMELHO)
                 if(div.classList.contains('occupied')) {
-                    mostrarAviso("⚠️ Este horário já está ocupado por outro cliente!", "var(--danger)");
+                    mostrarAviso("⚠️ Horário já ocupado!", "var(--danger)");
                     return;
                 }
                 document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
@@ -245,7 +289,5 @@
 </script>
 </body>
 </html>
-
-
 
 
