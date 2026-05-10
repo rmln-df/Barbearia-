@@ -10,27 +10,27 @@
     <style>
         :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #27ae60; --danger: #c0392b; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         
+        /* CONTAINER RESPONSIVO PROFISSIONAL */
         .app-container { width: 100%; max-width: 500px; height: 100vh; background: var(--bg); position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-
         @media (min-width: 600px) { .app-container { height: 92vh; border: 6px solid #333; border-radius: 30px; } }
-
+        
         .screen { display: none; height: 100%; padding: 20px; overflow-y: auto; }
         .screen.active { display: block; }
 
+        /* AVISOS */
         #toast-aviso { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; z-index: 1000; transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
         #toast-aviso.show { top: 20px; }
         
+        /* TÍTULOS */
         h3 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .titulo-principal { font-size: 45px !important; line-height: 1; margin-top: 40px; }
+        .titulo-principal { font-size: 45px !important; line-height: 1; margin-top: 40px; border-bottom: none; }
 
-        label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
-        small { color: #888; font-size: 11px; margin-bottom: 10px; display: block; }
-        
         input { width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; font-size: 16px; }
-        
+        label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
+
+        /* GRIDS E BOTÕES */
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .item { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
         .item span { font-size: 24px; display: block; margin-bottom: 5px; }
@@ -44,9 +44,10 @@
 
         .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; text-transform: uppercase; }
         .btn-back { background: #333; margin-top: 10px; }
-        
-        .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--primary); font-size: 14px; }
-        .tel-link { color: var(--primary); text-decoration: none; font-weight: bold; }
+
+        /* ADMIN CARDS */
+        .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--primary); font-size: 14px; cursor: pointer; }
+        .btn-del { background: var(--danger); color: white; border: none; padding: 5px; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%; }
     </style>
 </head>
 <body>
@@ -56,15 +57,9 @@
 
     <div id="screen-login" class="screen active">
         <h3 class="titulo-principal">Barbearia Waldemar</h3>
-        <!--
         <p style="text-align:center; color:gray; font-weight:bold; margin-bottom:30px;">WORK DESIGN</p>
-        -->
-        
-        <label>Seu Nome</label>
-        <input type="text" id="login-user" placeholder="Digite seu nome">
-        <label>Celular (Senha)</label>
-        <small>Use seu número para acessar a conta</small>
-        <input type="tel" id="login-pass" placeholder="Ex: 82999998888">
+        <input type="text" id="login-user" placeholder="Seu Nome">
+        <input type="tel" id="login-pass" placeholder="Celular (Senha)">
         <button class="btn" onclick="checkLogin()">ACESSAR SISTEMA</button>
     </div>
 
@@ -85,16 +80,14 @@
             <div class="item" onclick="selSr(this, 'Barba', 25)"><span>🪒</span><p>Barba</p></div>
             <div class="item" onclick="selSr(this, 'Combo', 50)"><span>🧔</span><p>Combo</p></div>
             <div class="item" onclick="selSr(this, 'Luzes', 30)"><span>💡</span><p>Luzes</p></div>
-            <div class="item" onclick="selSr(this, 'Corte/pigmentação', 30)"><span>🎨</span><p>Corte/Pigmentação</p></div>
+            <div class="item" onclick="selSr(this, 'Corte/pigmentação', 30)"><span>🎨</span><p>Pigmentação</p></div>
         </div>
         <button class="btn btn-back" onclick="nav('screen-staff')">VOLTAR</button>
     </div>
 
     <div id="screen-booking" class="screen">
         <h3>Agendamento</h3>
-        <label>Selecione a Data</label>
         <input type="date" id="book-date" onchange="atualizarHorariosDisponiveis()">
-        <label>Horários</label>
         <div id="time-container" class="time-grid"></div>
         <button class="btn" id="btn-reservar" onclick="confirmarAgendamento()">RESERVAR AGORA</button>
         <button class="btn btn-back" onclick="nav('screen-services')">VOLTAR</button>
@@ -108,31 +101,22 @@
 </div>
 
 <script>
-    const firebaseConfig = {
-        databaseURL: "https://barbearia-valdemar-default-rtdb.firebaseio.com",
-        projectId: "barbearia-valdemar",
-    };
-
+    const firebaseConfig = { databaseURL: "https://barbearia-valdemar-default-rtdb.firebaseio.com", projectId: "barbearia-valdemar" };
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
-    const WHATSAPP_ADMIN = "5582999480685";
 
     let sStaff = "", sService = "", sDur = 0, sTime = "", sUser = "", sPhone = "";
 
-    // Carrega os dados salvos se não for Admin
     window.onload = function() {
-        const salvoNome = localStorage.getItem('barbearia_nome');
-        const salvoFone = localStorage.getItem('barbearia_fone');
-        if(salvoNome) document.getElementById('login-user').value = salvoNome;
-        if(salvoFone) document.getElementById('login-pass').value = salvoFone;
+        const n = localStorage.getItem('barbearia_nome'), f = localStorage.getItem('barbearia_fone');
+        if(n) document.getElementById('login-user').value = n;
+        if(f) document.getElementById('login-pass').value = f;
+        if(n && f) ouvirMensagensAdm(n, f);
     }
 
     function mostrarAviso(texto, cor = "#e67e22") {
-        const toast = document.getElementById('toast-aviso');
-        toast.innerText = texto;
-        toast.style.background = cor;
-        toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 3000);
+        const t = document.getElementById('toast-aviso'); t.innerText = texto; t.style.background = cor; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 5000);
     }
 
     function nav(id) {
@@ -146,52 +130,73 @@
         const u = document.getElementById('login-user').value.trim();
         const p = document.getElementById('login-pass').value.trim();
         
-        // REGRA DE ADMIN: Limpa o LocalStorage e entra no painel
+        // LOGIN ADMIN (WD / 9994)
         if(u === "WD" && p === "9994") { 
-            localStorage.removeItem('barbearia_nome');
-            localStorage.removeItem('barbearia_fone');
+            localStorage.clear(); 
             document.getElementById('login-user').value = "";
             document.getElementById('login-pass').value = "";
             nav('screen-admin'); 
             return; 
         }
-        
-        if(u !== "" && (p.length >= 8)) {
-            // REGRA DE CLIENTE: Grava os dados para a próxima vez
-            localStorage.setItem('barbearia_nome', u);
+
+        // LOGIN CLIENTE
+        if(u !== "" && p.length >= 8) {
+            localStorage.setItem('barbearia_nome', u); 
             localStorage.setItem('barbearia_fone', p);
-            
-            sUser = u; sPhone = p; 
-            nav('screen-staff');
-        } else {
-            mostrarAviso("Preencha Nome e Celular corretamente!", "var(--danger)");
+            sUser = u; sPhone = p; ouvirMensagensAdm(u, p); nav('screen-staff');
+        } else { 
+            mostrarAviso("Nome ou Celular inválido!", "var(--danger)"); 
         }
     }
 
-    function selSt(el, n) {
-        document.querySelectorAll('#screen-staff .item').forEach(i => i.classList.remove('selected'));
-        el.classList.add('selected'); sStaff = n;
-        setTimeout(() => nav('screen-services'), 300);
+    function ouvirMensagensAdm(nome, fone) {
+        database.ref('agendamentos').on('value', snap => {
+            const ags = snap.val(); if(!ags) return;
+            Object.keys(ags).forEach(id => {
+                const ag = ags[id];
+                if(ag.cliente === nome && ag.telefone === fone && ag.msgAdm && !ag.lida) {
+                    mostrarAviso("📩 RESPOSTA: " + ag.msgAdm, "var(--success)");
+                    database.ref('agendamentos/' + id).update({ lida: true });
+                }
+            });
+        });
     }
 
-    function selSr(el, s, d) {
-        document.querySelectorAll('#screen-services .item').forEach(i => i.classList.remove('selected'));
-        el.classList.add('selected'); sService = s; sDur = d;
-        setTimeout(() => nav('screen-booking'), 300);
+    function renderAdmin() {
+        const container = document.getElementById('admin-list');
+        database.ref('agendamentos').on('value', snap => {
+            container.innerHTML = ""; const val = snap.val();
+            if(!val) return container.innerHTML = "Agenda vazia.";
+            Object.keys(val).forEach(id => {
+                const ag = val[id];
+                const card = document.createElement('div');
+                card.className = 'appointment-card';
+                card.onclick = (e) => { if(e.target.tagName !== 'BUTTON') responderCliente(id, ag.cliente); };
+                card.innerHTML = `<strong>${ag.profissional}</strong> | ${ag.cliente}<br><span>📞 ${ag.telefone}</span><br><span>${ag.servico} - ${ag.data} às ${ag.hora}</span><br>
+                ${ag.msgAdm ? `<small style="color:var(--success)">Enviado: ${ag.msgAdm}</small>` : '<small style="color:gray">Toque para responder</small>'}
+                <button class="btn-del" onclick="del('${id}')">REMOVER</button>`;
+                container.appendChild(card);
+            });
+        });
     }
+
+    function responderCliente(id, nome) {
+        let m = prompt(`Enviar mensagem interna para ${nome}:`, "Seu horário está confirmado!");
+        if(m) database.ref('agendamentos/' + id).update({ msgAdm: m, lida: false });
+    }
+
+    // AGENDAMENTO
+    function selSt(el, n) { document.querySelectorAll('#screen-staff .item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); sStaff = n; setTimeout(() => nav('screen-services'), 300); }
+    function selSr(el, s, d) { document.querySelectorAll('#screen-services .item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); sService = s; sDur = d; setTimeout(() => nav('screen-booking'), 300); }
 
     function gerarTabelaHorarios() {
-        const container = document.getElementById('time-container');
-        container.innerHTML = "";
-        const horarios = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00"];
-        horarios.forEach(hora => {
-            const div = document.createElement('div');
-            div.className = 'time-slot';
-            div.innerText = hora;
+        const container = document.getElementById('time-container'); container.innerHTML = "";
+        const horas = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00"];
+        horas.forEach(h => {
+            const div = document.createElement('div'); div.className = 'time-slot'; div.innerText = h;
             div.onclick = () => {
-                if(div.classList.contains('occupied')) { mostrarAviso("⚠️ Horário já ocupado!", "var(--danger)"); return; }
-                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
-                div.classList.add('selected'); sTime = hora;
+                if(div.classList.contains('occupied')) { mostrarAviso("⚠️ Ocupado!", "var(--danger)"); return; }
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected')); div.classList.add('selected'); sTime = h;
             };
             container.appendChild(div);
         });
@@ -199,62 +204,25 @@
     }
 
     function atualizarHorariosDisponiveis() {
-        const data = document.getElementById('book-date').value;
-        if(!data || !sStaff) return;
+        const d = document.getElementById('book-date').value; if(!d || !sStaff) return;
         database.ref('agendamentos').once('value').then(snap => {
             const ags = snap.val();
             document.querySelectorAll('.time-slot').forEach(slot => {
                 slot.classList.remove('occupied', 'selected');
-                const h = slot.innerText;
-                if(ags) {
-                    Object.values(ags).forEach(ag => {
-                        if(ag.data === data && ag.profissional === sStaff && ag.hora === h) {
-                            slot.classList.add('occupied');
-                        }
-                    });
-                }
+                if(ags) Object.values(ags).forEach(ag => { if(ag.data === d && ag.profissional === sStaff && ag.hora === slot.innerText) slot.classList.add('occupied'); });
             });
         });
     }
 
     function confirmarAgendamento() {
-        const data = document.getElementById('book-date').value;
-        if(!data || !sTime) return mostrarAviso("Escolha Data e Horário!", "var(--danger)");
-        const btn = document.getElementById('btn-reservar');
-        btn.innerText = "SALVANDO..."; btn.disabled = true;
-
-        database.ref('agendamentos').push({
-            cliente: sUser, telefone: sPhone, profissional: sStaff, servico: sService,
-            duracao: sDur, data, hora: sTime
-        }).then(() => {
-            mostrarAviso("✅ Sucesso! Horário reservado.", "var(--success)");
-            const msg = `Novo Agendamento!%0A👤 Cliente: ${sUser}%0A📞 Tel: ${sPhone}%0A✂️ Serviço: ${sService}%0A👨‍🦱 Profissional: ${sStaff}%0A📅 Data: ${data}%0A⏰ Hora: ${sTime}`;
-            setTimeout(() => {
-                window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_ADMIN}&text=${msg}`, '_blank');
-                location.reload(); 
-            }, 1500);
+        const d = document.getElementById('book-date').value; if(!d || !sTime) return mostrarAviso("Escolha Data e Horário!", "var(--danger)");
+        database.ref('agendamentos').push({ cliente: sUser, telefone: sPhone, profissional: sStaff, servico: sService, data: d, hora: sTime, lida: true }).then(() => {
+            mostrarAviso("✅ Reservado com sucesso!", "var(--success)");
+            setTimeout(() => { location.reload(); }, 1500);
         });
     }
 
-    function renderAdmin() {
-        const container = document.getElementById('admin-list');
-        database.ref('agendamentos').on('value', (snap) => {
-            container.innerHTML = "";
-            const val = snap.val();
-            if(!val) return container.innerHTML = "Agenda vazia.";
-            Object.keys(val).forEach(id => {
-                const ag = val[id];
-                container.innerHTML += `<div class="appointment-card">
-                    <strong style="color:var(--primary)">${ag.profissional}</strong> | ${ag.cliente}<br>
-                    <span>📞 <a href="tel:${ag.telefone}" class="tel-link">${ag.telefone}</a></span><br>
-                    <span>${ag.servico} - ${ag.data} às ${ag.hora}</span>
-                    <button class="btn" style="background:var(--danger); padding:5px; margin-top:8px;" onclick="del('${id}')">REMOVER</button>
-                </div>`;
-            });
-        });
-    }
-
-    function del(id) { if(confirm("Deseja realmente excluir este agendamento?")) database.ref('agendamentos/' + id).remove(); }
+    function del(id) { if(confirm("Excluir agendamento?")) database.ref('agendamentos/' + id).remove(); }
 </script>
 </body>
 </html>
