@@ -8,59 +8,67 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #27ae60; --danger: #c0392b; }
+        :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #27ae60; --danger: #c0392b; --info: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         
-        /* CONTAINER RESPONSIVO PROFISSIONAL */
         .app-container { width: 100%; max-width: 500px; height: 100vh; background: var(--bg); position: relative; overflow: hidden; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
         @media (min-width: 600px) { .app-container { height: 92vh; border: 6px solid #333; border-radius: 30px; } }
         
         .screen { display: none; height: 100%; padding: 20px; overflow-y: auto; }
-        .screen.active { display: block; }
+        .screen.active { display: block !important; }
 
-        /* AVISOS */
-        #toast-aviso { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; background: var(--primary); color: white; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; z-index: 1000; transition: 0.5s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
+        /* BARRA DE NOTIFICAÇÃO (APENAS PARA CLIENTES) */
+        #barra-mensagem { display: none; background: var(--success); color: white; padding: 12px; text-align: center; font-weight: bold; font-size: 14px; position: sticky; top: 0; width: 100%; z-index: 2000; border-bottom: 2px solid rgba(0,0,0,0.2); }
+
+        #toast-aviso { position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 90%; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; z-index: 3000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: white; }
         #toast-aviso.show { top: 20px; }
+
+        .login-box { margin-top: 40px; text-align: center; }
+        .login-box label { display: block; text-align: left; color: var(--primary); font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        input { width: 100%; padding: 16px; background: #2a2a2a; border: 2px solid #444; border-radius: 12px; color: #fff; margin-bottom: 20px; outline: none; font-size: 16px; }
         
-        /* TÍTULOS */
-        h3 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .titulo-principal { font-size: 45px !important; line-height: 1; margin-top: 40px; border-bottom: none; }
-
-        input { width: 100%; padding: 15px; background: #2a2a2a; border: 1px solid #444; border-radius: 12px; color: #fff; margin-bottom: 10px; outline: none; font-size: 16px; }
-        label { display: block; margin: 15px 0 8px; color: var(--primary); font-weight: bold; font-size: 14px; text-transform: uppercase; }
-
-        /* GRIDS E BOTÕES */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .item { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; }
-        .item span { font-size: 24px; display: block; margin-bottom: 5px; }
-        .item p { font-size: 13px; font-weight: 600; margin: 0; color: #eee; }
+        h3 { color: var(--primary); text-align: center; margin-bottom: 20px; font-size: 38px; font-weight: 800; text-transform: uppercase; }
+        
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .item { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 2px solid transparent; cursor: pointer; transition: 0.3s; min-height: 110px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .item span { font-size: 24px; margin-bottom: 5px; }
+        .item p { font-size: 13px; font-weight: bold; margin: 0; color: #eee; }
         .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); }
 
-        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
-        .time-slot { padding: 10px 5px; border-radius: 8px; text-align: center; font-size: 14px; font-weight: bold; border: 2px solid var(--primary); color: var(--primary); cursor: pointer; }
-        .time-slot.selected { background: var(--success); border-color: var(--success); color: white; }
-        .time-slot.occupied { background: var(--danger); border-color: var(--danger); color: white; opacity: 0.8; }
+        .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .time-slot { padding: 12px; border-radius: 8px; text-align: center; border: 2px solid var(--success); color: var(--success); cursor: pointer; font-weight: bold; }
+        .time-slot.selected { background: var(--info) !important; color: white !important; border-color: var(--info) !important; }
+        .time-slot.occupied { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; cursor: not-allowed; }
+        
+        .btn { width: 100%; padding: 18px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; text-transform: uppercase; }
+        .btn-back { background: #333; }
 
-        .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; background: var(--primary); color: #fff; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 16px; text-transform: uppercase; }
-        .btn-back { background: #333; margin-top: 10px; }
-
-        /* ADMIN CARDS */
-        .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--primary); font-size: 14px; cursor: pointer; }
-        .btn-del { background: var(--danger); color: white; border: none; padding: 5px; border-radius: 5px; margin-top: 10px; cursor: pointer; width: 100%; }
+        .appointment-card { background: var(--card); padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 5px solid var(--primary); position: relative; }
+        .card-info { cursor: pointer; margin-bottom: 10px; line-height: 1.4; }
+        .card-msg-footer { background: rgba(39, 174, 96, 0.1); border: 1px dashed var(--success); padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 13px; color: var(--success); font-weight: bold; }
+        .btn-excluir { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <div id="toast-aviso">Mensagem</div>
+    <div id="barra-mensagem"></div>
 
     <div id="screen-login" class="screen active">
-        <h3 class="titulo-principal">Barbearia Waldemar</h3>
-        <p style="text-align:center; color:gray; font-weight:bold; margin-bottom:30px;">WORK DESIGN</p>
-        <input type="text" id="login-user" placeholder="Seu Nome">
-        <input type="tel" id="login-pass" placeholder="Celular (Senha)">
-        <button class="btn" onclick="checkLogin()">ACESSAR SISTEMA</button>
+        <div class="login-box">
+            <h3>Barbearia Waldemar</h3>
+            
+            <!--
+            <p style="color: gray;margin-bottom: 30px; font-weight: bold;">WORK DESIGN</p>
+            -->
+            <label>NOME DO CLIENTE</label>
+            <input type="text" id="login-user" placeholder="Seu nome">
+            <label>CELULAR (SENHA)</label>
+            <input type="tel" id="login-pass" placeholder="82 99999-9999">
+            <button class="btn" onclick="checkLogin()">ENTRAR</button>
+        </div>
     </div>
 
     <div id="screen-staff" class="screen">
@@ -75,21 +83,22 @@
     <div id="screen-services" class="screen">
         <h3>Serviços</h3>
         <div class="grid">
-            <div class="item" onclick="selSr(this, 'Corte/Tesoura', 30)"><span>✂️</span><p>Corte/Tesoura</p></div>
-            <div class="item" onclick="selSr(this, 'Corte/Degradê', 30)"><span>🖲️</span><p>Corte/Degradê</p></div>
-            <div class="item" onclick="selSr(this, 'Barba', 25)"><span>🪒</span><p>Barba</p></div>
-            <div class="item" onclick="selSr(this, 'Combo', 50)"><span>🧔</span><p>Combo</p></div>
-            <div class="item" onclick="selSr(this, 'Luzes', 30)"><span>💡</span><p>Luzes</p></div>
-            <div class="item" onclick="selSr(this, 'Corte/pigmentação', 30)"><span>🎨</span><p>Pigmentação</p></div>
+            <div class="item" onclick="selSr(this, 'Corte/Tesoura')"><span>✂️</span><p>Corte</p></div>
+            <div class="item" onclick="selSr(this, 'Barba')"><span>🪒</span><p>Barba</p></div>
+            <div class="item" onclick="selSr(this, 'Combo')"><span>🧔</span><p>Combo</p></div>
+            <div class="item" onclick="selSr(this, 'Luzes')"><span>💡</span><p>Luzes</p></div>
+            <div class="item" onclick="selSr(this, 'Pigmentação')"><span>🎨</span><p>Pigmentação</p></div>
+            <div class="item" onclick="selSr(this, 'Sobrancelha')"><span>🤨</span><p>Sobrancelha</p></div>
         </div>
         <button class="btn btn-back" onclick="nav('screen-staff')">VOLTAR</button>
     </div>
 
     <div id="screen-booking" class="screen">
         <h3>Agendamento</h3>
+        <label>DATA</label>
         <input type="date" id="book-date" onchange="atualizarHorariosDisponiveis()">
         <div id="time-container" class="time-grid"></div>
-        <button class="btn" id="btn-reservar" onclick="confirmarAgendamento()">RESERVAR AGORA</button>
+        <button class="btn" onclick="confirmarAgendamento()">RESERVAR</button>
         <button class="btn btn-back" onclick="nav('screen-services')">VOLTAR</button>
     </div>
 
@@ -105,18 +114,21 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    let sStaff = "", sService = "", sDur = 0, sTime = "", sUser = "", sPhone = "";
+    let sStaff = "", sService = "", sTime = "", sUser = "", sPhone = "", isAdmin = false;
+
+    function avisar(texto, tipo = "aviso") {
+        const t = document.getElementById('toast-aviso');
+        t.innerText = texto;
+        t.style.background = tipo === "sucesso" ? "var(--success)" : (tipo === "erro" ? "var(--danger)" : "var(--primary)");
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 4000);
+    }
 
     window.onload = function() {
         const n = localStorage.getItem('barbearia_nome'), f = localStorage.getItem('barbearia_fone');
         if(n) document.getElementById('login-user').value = n;
         if(f) document.getElementById('login-pass').value = f;
-        if(n && f) ouvirMensagensAdm(n, f);
-    }
-
-    function mostrarAviso(texto, cor = "#e67e22") {
-        const t = document.getElementById('toast-aviso'); t.innerText = texto; t.style.background = cor; t.classList.add('show');
-        setTimeout(() => t.classList.remove('show'), 5000);
+        if(n && f && n !== "WD") { sUser = n; sPhone = f; ouvirMensagensAdm(n, f); }
     }
 
     function nav(id) {
@@ -127,38 +139,37 @@
     }
 
     function checkLogin() {
-        const u = document.getElementById('login-user').value.trim();
-        const p = document.getElementById('login-pass').value.trim();
-        
-        // LOGIN ADMIN (WD / 9994)
+        const uEl = document.getElementById('login-user'), pEl = document.getElementById('login-pass');
+        const u = uEl.value.trim(), p = pEl.value.trim();
+
         if(u === "WD" && p === "9994") { 
-            localStorage.clear(); 
-            document.getElementById('login-user').value = "";
-            document.getElementById('login-pass').value = "";
+            isAdmin = true;
+            uEl.value = ""; pEl.value = "";
+            document.getElementById('barra-mensagem').style.display = "none"; // Garante que some no admin
             nav('screen-admin'); 
             return; 
         }
 
-        // LOGIN CLIENTE
         if(u !== "" && p.length >= 8) {
-            localStorage.setItem('barbearia_nome', u); 
-            localStorage.setItem('barbearia_fone', p);
-            sUser = u; sPhone = p; ouvirMensagensAdm(u, p); nav('screen-staff');
-        } else { 
-            mostrarAviso("Nome ou Celular inválido!", "var(--danger)"); 
-        }
+            isAdmin = false;
+            localStorage.setItem('barbearia_nome', u); localStorage.setItem('barbearia_fone', p);
+            sUser = u; sPhone = p; 
+            ouvirMensagensAdm(u, p); 
+            nav('screen-staff');
+        } else { avisar("Dados inválidos!", "erro"); }
     }
 
     function ouvirMensagensAdm(nome, fone) {
+        // Se for admin, não precisa ouvir as próprias mensagens no topo
+        if(isAdmin) return;
+
         database.ref('agendamentos').on('value', snap => {
-            const ags = snap.val(); if(!ags) return;
-            Object.keys(ags).forEach(id => {
-                const ag = ags[id];
-                if(ag.cliente === nome && ag.telefone === fone && ag.msgAdm && !ag.lida) {
-                    mostrarAviso("📩 RESPOSTA: " + ag.msgAdm, "var(--success)");
-                    database.ref('agendamentos/' + id).update({ lida: true });
-                }
+            const ags = snap.val(); let msg = "";
+            if(ags) Object.values(ags).forEach(ag => { 
+                if(ag.cliente === nome && ag.telefone === fone && ag.msgAdm) msg = "📩 Resposta: " + ag.msgAdm; 
             });
+            const barra = document.getElementById('barra-mensagem');
+            if(msg && !isAdmin) { barra.innerText = msg; barra.style.display = "block"; } else { barra.style.display = "none"; }
         });
     }
 
@@ -171,32 +182,41 @@
                 const ag = val[id];
                 const card = document.createElement('div');
                 card.className = 'appointment-card';
-                card.onclick = (e) => { if(e.target.tagName !== 'BUTTON') responderCliente(id, ag.cliente); };
-                card.innerHTML = `<strong>${ag.profissional}</strong> | ${ag.cliente}<br><span>📞 ${ag.telefone}</span><br><span>${ag.servico} - ${ag.data} às ${ag.hora}</span><br>
-                ${ag.msgAdm ? `<small style="color:var(--success)">Enviado: ${ag.msgAdm}</small>` : '<small style="color:gray">Toque para responder</small>'}
-                <button class="btn-del" onclick="del('${id}')">REMOVER</button>`;
+                card.innerHTML = `
+                    <div class="card-info" onclick="responderCliente('${id}', '${ag.cliente}')">
+                        <strong style="color:var(--primary); font-size:18px;">${ag.profissional}</strong><br>
+                        <strong>Cliente:</strong> ${ag.cliente}<br>
+                        <strong>Serviço:</strong> ${ag.servico}<br>
+                        <strong>Horário:</strong> ${ag.hora} | ${ag.data}<br>
+                        <strong>Tel:</strong> ${ag.telefone}<br>
+                        ${ag.msgAdm ? `<div class="card-msg-footer">📩 Enviado: ${ag.msgAdm}</div>` : '<em style="color:gray; font-size:12px;">(Toque para responder ao cliente)</em>'}
+                    </div>
+                    <button class="btn-excluir" onclick="del('${id}')">Finalizar / Remover</button>
+                `;
                 container.appendChild(card);
             });
         });
     }
 
     function responderCliente(id, nome) {
-        let m = prompt(`Enviar mensagem interna para ${nome}:`, "Seu horário está confirmado!");
-        if(m) database.ref('agendamentos/' + id).update({ msgAdm: m, lida: false });
+        let m = prompt("Mensagem para " + nome);
+        if(m) database.ref('agendamentos/' + id).update({ msgAdm: m });
     }
 
-    // AGENDAMENTO
-    function selSt(el, n) { document.querySelectorAll('#screen-staff .item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); sStaff = n; setTimeout(() => nav('screen-services'), 300); }
-    function selSr(el, s, d) { document.querySelectorAll('#screen-services .item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); sService = s; sDur = d; setTimeout(() => nav('screen-booking'), 300); }
+    function del(id) { if(confirm("Deseja concluir o trabalho?")) database.ref('agendamentos/' + id).remove(); }
+
+    function selSt(el, n) { sStaff = n; document.querySelectorAll('#screen-staff .item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); setTimeout(() => nav('screen-services'), 300); }
+    function selSr(el, s) { sService = s; document.querySelectorAll('#screen-services .item').forEach(i => i.classList.remove('selected')); el.classList.add('selected'); setTimeout(() => nav('screen-booking'), 300); }
 
     function gerarTabelaHorarios() {
         const container = document.getElementById('time-container'); container.innerHTML = "";
-        const horas = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00"];
+        const horas = ["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00"];
         horas.forEach(h => {
             const div = document.createElement('div'); div.className = 'time-slot'; div.innerText = h;
             div.onclick = () => {
-                if(div.classList.contains('occupied')) { mostrarAviso("⚠️ Ocupado!", "var(--danger)"); return; }
-                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected')); div.classList.add('selected'); sTime = h;
+                if(div.classList.contains('occupied')) { avisar("Horário ocupado!", "erro"); return; }
+                document.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                div.classList.add('selected'); sTime = h;
             };
             container.appendChild(div);
         });
@@ -204,25 +224,25 @@
     }
 
     function atualizarHorariosDisponiveis() {
-        const d = document.getElementById('book-date').value; if(!d || !sStaff) return;
-        database.ref('agendamentos').once('value').then(snap => {
+        const d = document.getElementById('book-date').value; if(!d) return;
+        database.ref('agendamentos').once('value', snap => {
             const ags = snap.val();
             document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.classList.remove('occupied', 'selected');
-                if(ags) Object.values(ags).forEach(ag => { if(ag.data === d && ag.profissional === sStaff && ag.hora === slot.innerText) slot.classList.add('occupied'); });
+                slot.classList.remove('occupied');
+                if(ags) Object.values(ags).forEach(ag => {
+                    if(ag.data === d && ag.profissional === sStaff && ag.hora === slot.innerText) slot.classList.add('occupied');
+                });
             });
         });
     }
 
     function confirmarAgendamento() {
-        const d = document.getElementById('book-date').value; if(!d || !sTime) return mostrarAviso("Escolha Data e Horário!", "var(--danger)");
-        database.ref('agendamentos').push({ cliente: sUser, telefone: sPhone, profissional: sStaff, servico: sService, data: d, hora: sTime, lida: true }).then(() => {
-            mostrarAviso("✅ Reservado com sucesso!", "var(--success)");
-            setTimeout(() => { location.reload(); }, 1500);
+        const d = document.getElementById('book-date').value;
+        if(!d || !sTime) { avisar("Escolha data e hora!", "aviso"); return; }
+        database.ref('agendamentos').push({ cliente: sUser, telefone: sPhone, profissional: sStaff, servico: sService, data: d, hora: sTime }).then(() => {
+            avisar("Reservado!", "sucesso"); setTimeout(() => location.reload(), 2000);
         });
     }
-
-    function del(id) { if(confirm("Excluir agendamento?")) database.ref('agendamentos/' + id).remove(); }
 </script>
 </body>
 </html>
