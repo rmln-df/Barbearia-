@@ -8,7 +8,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
-        :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success: #ff8800; --danger: #c0392b; --info: #3498db; }
+        :root { --bg: #121212; --card: #1c1c1c; --primary: #e67e22; --text: #ffffff; --success:
+        #ff8800;
+      --danger: #c0392b; --info: #3498db; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background-color: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
         
@@ -37,7 +39,19 @@
         .item.selected { border-color: var(--primary); background: rgba(230, 126, 34, 0.15); }
 
         .time-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        
+        .time-slot {
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+    border: 2px solid #ff8800;
+    color: #fff;
+    cursor: pointer;
+    font-weight: bold;
+}
+        /* 👆
         .time-slot { padding: 12px; border-radius: 8px; text-align: center; border: 2px solid var(--success); color: var(--success); cursor: pointer; font-weight: bold; }
+        */
         .time-slot.selected { background: var(--info) !important; color: white !important; border-color: var(--info) !important; }
         .time-slot.occupied { background: var(--danger) !important; color: white !important; border-color: var(--danger) !important; cursor: not-allowed; }
         
