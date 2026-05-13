@@ -62,6 +62,15 @@
         .card-info { cursor: pointer; margin-bottom: 10px; line-height: 1.4; }
         .card-msg-footer { background: rgba(39, 174, 96, 0.1); border: 1px dashed var(--success); padding: 8px; border-radius: 8px; margin-top: 10px; font-size: 13px; color: var(--success); font-weight: bold; }
         .btn-excluir { background: var(--danger); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; }
+        
+        .icone-servico{
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-bottom: 8px;
+}
+        
+        
     </style>
 </head>
 <body>
@@ -93,6 +102,57 @@
         </div>
         <button class="btn btn-back" onclick="nav('screen-login')">VOLTAR</button>
     </div>
+    
+    
+    
+    <!-- SERVIÇOS -->
+
+<div id="screen-services" class="screen">
+
+<h3>Serviços</h3>
+
+<div class="grid">
+
+<div class="item" onclick="selSr(this, 'corte tesoura')">
+<img src="img/corte tesoura.png" class="icone-servico">
+<p>corte tesoura</p>
+</div>
+
+<div class="item" onclick="selSr(this, 'corte a máquina')">
+<img src="img/corte a máquina.png" class="icone-servico">
+<p>corte a máquina</p>
+</div>
+
+<div class="item" onclick="selSr(this, 'corte combo')">
+<img src="img/corte combo.png" class="icone-servico">
+<p>corte combo</p>
+</div>
+
+<div class="item" onclick="selSr(this, 'corte com luzes')">
+<img src="img/corte com luzes.png" class="icone-servico">
+<p>corte com luzes</p>
+</div>
+
+<div class="item" onclick="selSr(this, 'corte pigmentação')">
+<img src="img/corte pigmentação.png" class="icone-servico">
+<p>corte pigmentação</p>
+</div>
+
+<div class="item" onclick="selSr(this, 'corte degradê')">
+<img src="img/corte degradê.png" class="icone-servico">
+<p>corte degradê</p>
+</div>
+
+</div>
+
+<button class="btn btn-back" onclick="nav('screen-staff')">
+VOLTAR
+</button>
+
+</div>
+    
+  <!--  ☝️
+    
 
     <div id="screen-services" class="screen">
         <h3>Serviços</h3>
@@ -106,6 +166,8 @@
         </div>
         <button class="btn btn-back" onclick="nav('screen-staff')">VOLTAR</button>
     </div>
+    
+    -->
 
     <div id="screen-booking" class="screen">
         <h3>Agendamento</h3>
@@ -301,4 +363,5 @@
 </html>
 
 
-    
+   
+
